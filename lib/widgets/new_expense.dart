@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:expense_tracker/models/expense.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.onAddExpense});
+  final void Function(Expense) onAddExpense;
 
   @override
   State<StatefulWidget> createState() {
@@ -30,6 +31,42 @@ class _NewExpenseState extends State<NewExpense> {
     });
   }
 
+  void _submitExpenseData() {
+    if (_titleController.text.trim().isEmpty ||
+        double.tryParse(_priceController.text) == null ||
+        double.tryParse(_priceController.text)! <= 0 ||
+        _selectedDate == null) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Invalid input'),
+          content: const Text('Please enter valid data'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('Okay'),
+            ),
+          ],
+        ),
+      );
+      return;
+    } else {
+      final enteredTitle = _titleController.text;
+      final enteredPrice = double.parse(_priceController.text);
+      widget.onAddExpense(
+        Expense(
+          title: enteredTitle,
+          amount: enteredPrice,
+          date: _selectedDate!,
+          category: _selectedCategory,
+        ),
+      );
+      Navigator.pop(context);
+    }
+  }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -40,7 +77,7 @@ class _NewExpenseState extends State<NewExpense> {
   @override
   Widget build(context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
       child: Column(
         children: [
           TextField(
@@ -93,7 +130,8 @@ class _NewExpenseState extends State<NewExpense> {
                       (category) => DropdownMenuItem(
                         value: category,
                         child: Text(
-                          category.name.replaceRange(0, 1, category.name[0].toUpperCase()),
+                          category.name.replaceRange(
+                              0, 1, category.name[0].toUpperCase()),
                         ),
                       ),
                     )
@@ -112,10 +150,7 @@ class _NewExpenseState extends State<NewExpense> {
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () {
-                  print(_titleController.text);
-                  print(_priceController.text);
-                },
+                onPressed: _submitExpenseData,
                 child: const Text('Save expense'),
               ),
             ],
