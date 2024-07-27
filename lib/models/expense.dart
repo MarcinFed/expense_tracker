@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
 const uuid = Uuid();
-final formater = DateFormat.yMd();
+final formatter = DateFormat.yMd();
 
 enum Category {
   food,
@@ -34,7 +34,7 @@ class Expense {
   final Category category;
 
   String get formattedDate {
-    return formater.format(date);
+    return formatter.format(date);
   }
 
   IconData get icon {
